@@ -1,23 +1,43 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:basalt_deltas",
+        "minecraft:meadow",
+        "minecraft:frozen_peaks",
+        "minecraft:jagged_peaks",
+        "minecraft:stony_peaks",
+        "minecraft:snowy_slopes",
+        "minecraft:plains",
+        "minecraft:desert"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:basalt_deltas",
-    "minecraft:meadow",
-    "minecraft:frozen_peaks",
-    "minecraft:jagged_peaks",
-    "minecraft:stony_peaks",
-    "minecraft:snowy_slopes",
-    "minecraft:plains",
-    "minecraft:desert"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 5,
-    "shiny_chance": 512.0,
-    "pokemon_rarity": "rare",
-    "species": "torkoal",
-    "waves": 3
+    "pokemon": "torkoal",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 5
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "rare"
   },
-  "rewards": {}
+  "rewards": {
+    "item_rewards": [],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
+  }
 }

@@ -1,29 +1,50 @@
 {
-  "algorithms": {
-    "spawn_range": 20.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:grove",
+        "minecraft:snowy_taiga",
+        "minecraft:ice_spikes",
+        "minecraft:snowy_plains",
+        "minecraft:forest",
+        "minecraft:flower_forest",
+        "minecraft:birch_forest",
+        "minecraft:old_growth_birch_forest",
+        "minecraft:dark_forest",
+        "minecraft:grove",
+        "minecraft:savanna",
+        "minecraft:savanna_plateau",
+        "minecraft:windswept_savanna",
+        "minecraft:plains",
+        "minecraft:sunflower_plains"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:grove",
-    "minecraft:snowy_taiga",
-    "minecraft:ice_spikes",
-    "minecraft:snowy_plains",
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:grove",
-    "minecraft:savanna",
-    "minecraft:savanna_plateau",
-    "minecraft:windswept_savanna",
-    "minecraft:plains",
-    "minecraft:sunflower_plains"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 5,
-    "pokemon_rarity": "rare",
-    "species": "arcanine",
-    "waves": 3
+    "pokemon": "arcanine",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 5
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "rare"
   },
-  "rewards": {}
+  "rewards": {
+    "item_rewards": [],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
+  }
 }

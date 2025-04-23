@@ -1,23 +1,58 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:deep_dark"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:deep_dark"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 2,
-    "shiny_chance": 512.0,
-    "pokemon_rarity": "epic",
-    "species": "spiritomb",
-    "waves": 8
+    "pokemon": "spiritomb",
+    "wave_data": {
+      "waves": 8,
+      "spawns_per_wave": 2
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "epic"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:rare_candy",
-      "cobblemon:rare_candy",
-      "cobblemon:rare_candy"
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      }
     ],
     "experience_reward": 2000
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

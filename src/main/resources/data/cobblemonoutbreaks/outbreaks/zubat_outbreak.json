@@ -1,32 +1,64 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:forest",
+        "minecraft:flower_forest",
+        "minecraft:birch_forest",
+        "minecraft:old_growth_birch_forest",
+        "minecraft:dark_forest",
+        "minecraft:grove",
+        "minecraft:plains",
+        "minecraft:bamboo_jungle",
+        "minecraft:jungle",
+        "minecraft:sparse_jungle",
+        "minecraft:mangrove_swamp",
+        "minecraft:swamp",
+        "minecraft:flower_forest",
+        "#cobblemon:is_spooky"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:grove",
-    "minecraft:plains",
-    "minecraft:bamboo_jungle",
-    "minecraft:jungle",
-    "minecraft:sparse_jungle",
-    "minecraft:mangrove_swamp",
-    "minecraft:swamp",
-    "minecraft:flower_forest",
-    "#cobblemon:is_spooky"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 5,
-    "species": "zubat",
-    "waves": 3
+    "pokemon": "zubat",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 5
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "common"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:rare_candy",
-      "cobblemon:rare_candy"
-    ]
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      }
+    ],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

@@ -1,22 +1,44 @@
 {
-  "algorithms": {
-    "spawn_range": 20.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:flower_forest",
+        "minecraft:forest",
+        "minecraft:flower_forest",
+        "minecraft:birch_forest",
+        "minecraft:old_growth_birch_forest",
+        "minecraft:dark_forest",
+        "minecraft:grove",
+        "minecraft:plains",
+        "minecraft:taiga"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:flower_forest",
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:grove",
-    "minecraft:plains",
-    "minecraft:taiga"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 4,
-    "species": "sawsbuck",
-    "waves": 4
+    "pokemon": "sawsbuck",
+    "wave_data": {
+      "waves": 4,
+      "spawns_per_wave": 4
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "common"
   },
-  "rewards": {}
+  "rewards": {
+    "item_rewards": [],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
+  }
 }

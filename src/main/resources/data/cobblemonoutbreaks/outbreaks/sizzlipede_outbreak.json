@@ -1,23 +1,55 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:badlands",
+        "minecraft:eroded_badlands",
+        "minecraft:wooded_badlands",
+        "minecraft:basalt_deltas",
+        "minecraft:nether_wastes"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:wooded_badlands",
-    "minecraft:basalt_deltas",
-    "minecraft:nether_wastes"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 3,
-    "species": "sizzlipede",
-    "waves": 5
+    "pokemon": "sizzlipede",
+    "wave_data": {
+      "waves": 5,
+      "spawns_per_wave": 3
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "common"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:fire_stone",
-      "cobblemon:fire_stone"
-    ]
+      {
+        "item_reward": {
+          "id": "cobblemon:fire_stone",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:fire_stone",
+          "count": 1
+        },
+        "chance": 1.0
+      }
+    ],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

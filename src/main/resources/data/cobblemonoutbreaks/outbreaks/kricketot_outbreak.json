@@ -1,19 +1,41 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:forest",
+        "minecraft:flower_forest",
+        "minecraft:birch_forest",
+        "minecraft:old_growth_birch_forest",
+        "minecraft:dark_forest",
+        "minecraft:grove"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:grove"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 3,
-    "species": "kricketot",
-    "waves": 5
+    "pokemon": "kricketot",
+    "wave_data": {
+      "waves": 5,
+      "spawns_per_wave": 3
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "common"
   },
-  "rewards": {}
+  "rewards": {
+    "item_rewards": [],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
+  }
 }
