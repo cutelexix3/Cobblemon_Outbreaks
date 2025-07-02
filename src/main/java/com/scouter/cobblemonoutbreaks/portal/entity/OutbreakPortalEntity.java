@@ -1,8 +1,13 @@
 package com.scouter.cobblemonoutbreaks.portal.entity;
 
+import com.cobblemon.mod.common.api.Priority;
+import com.cobblemon.mod.common.api.abilities.Abilities;
+import com.cobblemon.mod.common.api.abilities.Ability;
+import com.cobblemon.mod.common.api.abilities.AbilityTemplate;
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.cobblemon.mod.common.pokemon.properties.HiddenAbilityProperty;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -353,8 +358,6 @@ public class OutbreakPortalEntity {
             PokemonEntity pokemonEntity = properties.createEntity(level);
 
 
-
-
             pokemonEntity.setDespawner(getDespawner());
 
             Vec3 spawnPos = getPortal().getOutbreakAlgorithms().getSpawnAlgorithm().spawnPosition(serverLevel, pos, this, pokemonEntity);
@@ -366,7 +369,6 @@ public class OutbreakPortalEntity {
 
             pokemonEntity.setPos(spawnPos);
             Pokemon pokemon1 = pokemonEntity.getPokemon();
-
             if (pokemon1 == null) {
                 //Decided not to add this since it will spawn the logs otherwise.
                 //LOGGER.info("Spawning for Pokémon {} failed, due to spawnPos {} or Pokémon {}", pokemon1.getSpecies(), spawnPos, pokemon1.getSpecies());
@@ -381,7 +383,8 @@ public class OutbreakPortalEntity {
             }
 
 
-
+            //HiddenAbilityProperty property = new HiddenAbilityProperty(true);
+            //property.apply(pokemonEntity);
             level.addFreshEntity(pokemonEntity);
             //if (CobblemonOutbreaksConfig.OUTBREAK_PORTAL_SPAWN_SOUND.get()) {
             if (OutbreakConfigManager.getConfig().getSound().isOutbreakPortalSpawnSound()) {

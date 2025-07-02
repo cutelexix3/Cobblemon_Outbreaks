@@ -4,25 +4,25 @@
     "outbreak_max_y": 255,
     "biome_settings": {
       "biome": [
-        "minecraft:grove",
-        "minecraft:snowy_taiga",
-        "minecraft:ice_spikes",
-        "minecraft:snowy_plains",
+        "minecraft:windswept_hills",
+        "minecraft:windswept_forest",
+        "minecraft:windswept_gravelly_hills",
+        "minecraft:taiga",
+        "minecraft:birch_forest",
+        "minecraft:cherry_grove",
+        "minecraft:dark_forest",
         "minecraft:forest",
         "minecraft:flower_forest",
-        "minecraft:birch_forest",
-        "minecraft:old_growth_birch_forest",
-        "minecraft:dark_forest",
-        "minecraft:grove",
-        "minecraft:savanna",
-        "minecraft:savanna_plateau",
-        "minecraft:windswept_savanna",
+        "minecraft:meadow",
+        "minecraft:mushroom_fields",
         "minecraft:plains",
-        "minecraft:sunflower_plains"
+        "minecraft:sunflower_plains",
+        "minecraft:stony_peaks",
+        "minecraft:swamp"
       ]
     }
   },
-  "gate_timer": 36000,
+  "gate_timer": 72000,
   "species_data": {
     "pokemon": "arcanine",
     "wave_data": {
@@ -36,8 +36,37 @@
     "pokemon_rarity": "rare"
   },
   "rewards": {
-    "item_rewards": [],
-    "experience_reward": 0
+    "item_rewards": [
+      {
+        "item_reward": {
+          "id": "cobblemon:exp_candy_xs",
+          "count": 6
+        },
+        "chance": 0.3
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:exp_candy_s",
+          "count": 4
+        },
+        "chance": 0.3
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:exp_candy_m",
+          "count": 2
+        },
+        "chance": 0.2
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:exp_candy_l",
+          "count": 1
+        },
+        "chance": 0.2
+      }
+    ],
+    "experience_reward": 300
   },
   "algorithms": {
     "level_algorithm": {

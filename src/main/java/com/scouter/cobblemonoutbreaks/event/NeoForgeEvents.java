@@ -37,7 +37,7 @@ import java.util.*;
 public class NeoForgeEvents {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Random RANDOM = new Random(); // Single instance for efficiency
+    private static final Random RANDOM = new Random();
 
     @SubscribeEvent
     public static void createRandomOutbreaks(ServerTickEvent.Post event) {
