@@ -2,7 +2,7 @@ package com.scouter.cobblemonoutbreaks.event;
 
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
-import com.scouter.cobblemonoutbreaks.entity.OutbreakPortalEntity;
+import com.scouter.cobblemonoutbreaks.portal.entity.OutbreakPortalEntity;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.level.ServerLevel;

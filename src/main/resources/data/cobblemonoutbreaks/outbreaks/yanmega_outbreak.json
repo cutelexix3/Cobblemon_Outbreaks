@@ -1,23 +1,54 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:river",
+        "minecraft:frozen_river",
+        "minecraft:mangrove_swamp",
+        "minecraft:swamp"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:river",
-    "minecraft:frozen_river",
-    "minecraft:mangrove_swamp",
-    "minecraft:swamp"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 2,
-    "pokemon_rarity": "rare",
-    "species": "yanmega",
-    "waves": 2
+    "pokemon": "yanmega",
+    "wave_data": {
+      "waves": 2,
+      "spawns_per_wave": 2
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "rare"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:leaf_stone",
-      "cobblemon:hard_stone"
-    ]
+      {
+        "item_reward": {
+          "id": "cobblemon:leaf_stone",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:hard_stone",
+          "count": 1
+        },
+        "chance": 1.0
+      }
+    ],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

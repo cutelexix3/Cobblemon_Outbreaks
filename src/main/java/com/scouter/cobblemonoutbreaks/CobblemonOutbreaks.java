@@ -5,14 +5,16 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.scouter.cobblemonoutbreaks.command.OutbreakPortalCommand;
-import com.scouter.cobblemonoutbreaks.config.CobblemonOutbreaksConfig;
-import com.scouter.cobblemonoutbreaks.data.OutbreakManager;
+import com.scouter.cobblemonoutbreaks.config.OutbreakConfigManager;
 import com.scouter.cobblemonoutbreaks.data.OutbreaksJsonDataManager;
-import com.scouter.cobblemonoutbreaks.data.PokemonOutbreakManager;
-import com.scouter.cobblemonoutbreaks.entity.OutbreakPortalEntity;
 import com.scouter.cobblemonoutbreaks.event.CobblemonOutbreaksEvent;
-import com.scouter.cobblemonoutbreaks.setup.ClientSetup;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakManager;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakPlayerManager;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakWorldManager;
+import com.scouter.cobblemonoutbreaks.manager.PokemonOutbreakManager;
+import com.scouter.cobblemonoutbreaks.portal.entity.OutbreakPortalEntity;
 import com.scouter.cobblemonoutbreaks.setup.Registration;
+import com.scouter.cobblemonoutbreaks.util.PortalUtils;
 import kotlin.Unit;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -33,10 +35,7 @@ import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class CobblemonOutbreaks implements ModInitializer {
     // This logger is used to write text to the console and the log file.
@@ -45,6 +44,7 @@ public class CobblemonOutbreaks implements ModInitializer {
     public static final String MODID = "cobblemonoutbreaks";
     public static final Logger LOGGER = LoggerFactory.getLogger("cobblemonoutbreaks");
     public static ServerLevel serverlevel;
+
     public static boolean serverStarted = false;
     @Override
     public void onInitialize() {
@@ -53,16 +53,18 @@ public class CobblemonOutbreaks implements ModInitializer {
             try {
                 serverStarted = true;
                 serverlevel = server.getLevel(Level.OVERWORLD);
-                OutbreakManager.get(Objects.requireNonNull(server.getLevel(Level.OVERWORLD)));
-                PokemonOutbreakManager.get(Objects.requireNonNull(server.getLevel(Level.OVERWORLD)));
+                OutbreakManager.get(server.getLevel(Level.OVERWORLD));
+                PokemonOutbreakManager.get(server.getLevel(Level.OVERWORLD));
+                OutbreakPlayerManager.get(server.getLevel(Level.OVERWORLD));
+                OutbreakWorldManager.get(server.getLevel(Level.OVERWORLD));
             } catch (Exception e) {
                 LOGGER.error("Failed getting the server for cobblemonoutbreaks due to", e);
             }
         });
+        OutbreakConfigManager.loadAndReloadConfig();
 
-        CobblemonOutbreaksConfig.registerConfigs();
         Registration.init();
-        ClientSetup.init();
+
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new OutbreaksJsonDataManager());
 
 
@@ -72,13 +74,13 @@ public class CobblemonOutbreaks implements ModInitializer {
         CobblemonOutbreaks.entityLoad();
         CobblemonOutbreaks.tickOutbreaks();
         CobblemonOutbreaks.flushMap();
-
+        CobblemonOutbreaks.createRandomOutbreaks();
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> OutbreakPortalCommand.register(commandDispatcher));
     }
 
 
     public static ResourceLocation prefix(String name) {
-        return new ResourceLocation(MODID, name.toLowerCase(Locale.ROOT));
+        return  ResourceLocation.fromNamespaceAndPath(MODID, name.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -179,6 +181,30 @@ public class CobblemonOutbreaks implements ModInitializer {
         });
     }
 
+    public static void createRandomOutbreaks() {
+        ServerTickEvents.END_WORLD_TICK.register(level -> {
+            if(OutbreakConfigManager.getConfig().getSpawningConfig().isPerPlayer() || level.getServer().overworld().isClientSide) return;
+
+            ServerLevel serverLevel = (ServerLevel) level.getServer().overworld();
+            OutbreakWorldManager outbreakWorldManager = OutbreakWorldManager.get(serverLevel);
+            if(outbreakWorldManager.getTimeLeft() <= 0) {
+                outbreakWorldManager.setTimeLeft(OutbreakConfigManager.getConfig().getSpawningConfig().getRandomOutbreakTimer());
+            }
+            if(outbreakWorldManager.decreaseAndGetTime() > 0) {
+                return;
+            }
+            List<ServerPlayer> allPlayers = level.getServer().getPlayerList().getPlayers();
+            int maxPlayers = OutbreakConfigManager.getConfig().getSpawningConfig().getRandomPlayerCount();
+            List<ServerPlayer> selectedPlayers = PortalUtils.getRandomPlayers(allPlayers, maxPlayers);
+
+            for (ServerPlayer player : selectedPlayers) {
+                PortalUtils.processOutbreaks(player, OutbreakConfigManager.getConfig().getSpawningConfig().getOutbreakSpawnCount());
+            }
+        });
+    }
+
+
+
     public static void tickOutbreaks() {
         ServerTickEvents.END_WORLD_TICK.register(server -> {
             if (server.isClientSide || !CobblemonOutbreaks.serverStarted) return;
@@ -190,6 +216,7 @@ public class CobblemonOutbreaks implements ModInitializer {
                 BlockPos pos = entry.getValue().getBlockPosition();
                 ChunkPos chunkPos = new ChunkPos(pos);
                 OutbreakPortalEntity outbreakPortal = entry.getValue();
+                if(outbreakPortal.isWasCleared()) outbreakManager.removePortal(outbreakPortal.getEntityIdData().getOutbreakUUID());
                 if(serverLevel.getChunkSource().hasChunk(chunkPos.x, chunkPos.z)) {
                     if (outbreakPortal.getLevel() == null) outbreakPortal.setLevel(serverLevel);
                     if (outbreakPortal.getOutbreakManager() == null) outbreakPortal.setOutbreakManager(PokemonOutbreakManager.get(serverLevel));
@@ -199,12 +226,13 @@ public class CobblemonOutbreaks implements ModInitializer {
         });
     }
 
-    private static int flushTimerTempMap = CobblemonOutbreaksConfig.TEMP_OUTBREAKS_MAP_FLUSH_TIMER;
-    private static int flushTimerMap = CobblemonOutbreaksConfig.OUTBREAKS_MAP_FLUSH_TIMER;
+    private static int flushTimerTempMap = OutbreakConfigManager.getConfig().getGeneral().getTempOutbreaksFlushTimer();
+    private static int flushTimerMap = OutbreakConfigManager.getConfig().getGeneral().getOutbreaksFlushTimer();
+
     public static void flushMap() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if(flushTimerMap <= 0) flushTimerMap = CobblemonOutbreaksConfig.OUTBREAKS_MAP_FLUSH_TIMER;
-            if(flushTimerTempMap <= 0) flushTimerMap = CobblemonOutbreaksConfig.TEMP_OUTBREAKS_MAP_FLUSH_TIMER;
+            if(flushTimerMap <= 0) flushTimerMap =  OutbreakConfigManager.getConfig().getGeneral().getOutbreaksFlushTimer();
+            if(flushTimerTempMap <= 0) flushTimerTempMap = OutbreakConfigManager.getConfig().getGeneral().getTempOutbreaksFlushTimer();
 
             tickTempFlushTimer(server);
             tickFlushTimer(server);
@@ -215,7 +243,7 @@ public class CobblemonOutbreaks implements ModInitializer {
         if (flushTimerTempMap-- > 0) return;
         PokemonOutbreakManager outbreakManager = PokemonOutbreakManager.get(server.getLevel(Level.OVERWORLD));
         outbreakManager.clearTempMap();
-        flushTimerTempMap =  CobblemonOutbreaksConfig.TEMP_OUTBREAKS_MAP_FLUSH_TIMER;
+        flushTimerTempMap =  OutbreakConfigManager.getConfig().getGeneral().getTempOutbreaksFlushTimer();
     }
 
     public static void tickFlushTimer(MinecraftServer server){
@@ -223,7 +251,7 @@ public class CobblemonOutbreaks implements ModInitializer {
         server.getPlayerList().broadcastSystemMessage(Component.translatable("cobblemonoutbreaks.clearing_pokemon_outbreaks_map").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
         PokemonOutbreakManager outbreakManager = PokemonOutbreakManager.get(server.getLevel(Level.OVERWORLD));
         outbreakManager.clearTempMap();
-        flushTimerMap =  CobblemonOutbreaksConfig.OUTBREAKS_MAP_FLUSH_TIMER;
+        flushTimerMap = OutbreakConfigManager.getConfig().getGeneral().getOutbreaksFlushTimer();
     }
 }
 

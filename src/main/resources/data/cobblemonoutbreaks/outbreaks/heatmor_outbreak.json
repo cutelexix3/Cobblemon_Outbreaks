@@ -1,17 +1,38 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:badlands",
+        "minecraft:eroded_badlands",
+        "minecraft:wooded_badlands"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:wooded_badlands"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 3,
-    "pokemon_rarity": "rare",
-    "species": "heatmor",
-    "waves": 5
+    "pokemon": "heatmor",
+    "wave_data": {
+      "waves": 5,
+      "spawns_per_wave": 3
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "rare"
   },
-  "rewards": {}
+  "rewards": {
+    "item_rewards": [],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
+  }
 }

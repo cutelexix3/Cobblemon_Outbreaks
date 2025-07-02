@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
-	id 'org.jetbrains.kotlin.jvm' version "1.7.10"
+	id 'org.jetbrains.kotlin.jvm' version "2.2.0"
 }
 
 version = project.mod_version
@@ -27,27 +27,17 @@ repositories {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered() {
-		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.19.3:2023.03.12@zip")
-	}
+	mappings loom.officialMojangMappings()
+
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	//modImplementation"curse.maven:cobblemon-687131:4468330"
-	////modCompileOnlyApi"curse.maven:cobblemon-687131:4468321"
-	//modRuntimeOnly"curse.maven:cobblemon-687131:4468330"
+	modImplementation"maven.modrinth:cobblemon:v77SHSXW"
 
-	modImplementation"curse.maven:architectury-419699:4663009"
-
-	modImplementation"maven.modrinth:cobblemon:YEzu8qAH"
-
-	modCompileOnlyApi "curse.maven:jei-238222:4712867"
-	modRuntimeOnly "curse.maven:jei-238222:4712867"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib"
+	implementation "org.jetbrains.kotlin:kotlin-reflect"
 }
 
 base {
@@ -64,7 +54,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {
@@ -73,8 +63,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

@@ -4,18 +4,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.scouter.cobblemonoutbreaks.CobblemonOutbreaks;
-import com.scouter.cobblemonoutbreaks.data.OutbreakManager;
-import com.scouter.cobblemonoutbreaks.data.OutbreakPlayerManager;
 import com.scouter.cobblemonoutbreaks.data.OutbreaksJsonDataManager;
-import com.scouter.cobblemonoutbreaks.data.PokemonOutbreakManager;
-import com.scouter.cobblemonoutbreaks.entity.OutbreakPortal;
-import com.scouter.cobblemonoutbreaks.entity.OutbreakPortalEntity;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakManager;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakPlayerManager;
+import com.scouter.cobblemonoutbreaks.manager.OutbreakWorldManager;
+import com.scouter.cobblemonoutbreaks.manager.PokemonOutbreakManager;
+import com.scouter.cobblemonoutbreaks.portal.OutbreakPortal;
+import com.scouter.cobblemonoutbreaks.portal.entity.OutbreakPortalEntity;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -29,6 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OutbreakPortalCommand {
     public static final Logger LOGGER = LoggerFactory.getLogger("cobblemonoutbreaks");
@@ -68,6 +72,16 @@ public class OutbreakPortalCommand {
         builder.then(Commands.literal("update_files").executes(c -> {
             return updateFiles(c);
         }));
+
+        builder.then(Commands.literal("prevent_outbreak_spawns")
+                .then(Commands.argument("width", IntegerArgumentType.integer(1, 50))
+                        .then(Commands.argument("height", IntegerArgumentType.integer(1, 50))
+                                .executes(OutbreakPortalCommand::preventOutbreakSpawns))));
+
+        builder.then(Commands.literal("remove_outbreak_spawns_prevention")
+                .then(Commands.argument("width", IntegerArgumentType.integer(1, 50))
+                        .then(Commands.argument("height", IntegerArgumentType.integer(1, 50))
+                                .executes(OutbreakPortalCommand::removeOutbreakSpawns))));
 
         builder.then(Commands.argument("pos", Vec3Argument.vec3()).then(Commands.argument("type", ResourceLocationArgument.id()).suggests(SUGGEST_TYPE).executes(c -> {
             return openOutBreakPortal(c, Vec3Argument.getVec3(c, "pos"), ResourceLocationArgument.getId(c, "type"));
@@ -145,14 +159,13 @@ public class OutbreakPortalCommand {
         }
         return 0;
     }
-
     public static int updateFiles(CommandContext<CommandSourceStack> c) {
-        int updatedFile = 0;
+        AtomicInteger updatedFile = new AtomicInteger();
         Entity nullableSummoner = c.getSource().getEntity();
         Path PATH = FabricLoader.getInstance().getGameDir().resolve("cobblemon_outbreaks_updated_json_files");
         try {
             Map<ResourceLocation, OutbreakPortal> portals = OutbreaksJsonDataManager.getData();
-
+//
             try {
                 Files.createDirectories(PATH); // Create the directory if it doesn't exist
             } catch (IOException e) {
@@ -161,14 +174,17 @@ public class OutbreakPortalCommand {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             for(Map.Entry<ResourceLocation, OutbreakPortal> portalEntry : portals.entrySet()) {
                 if(portalEntry.getValue().isOld()){
-                DataResult<JsonElement> jsonElement = OutbreakPortal.CODEC.encodeStart(JsonOps.INSTANCE, portalEntry.getValue());
+                    OutbreakPortal.CODEC.encodeStart(JsonOps.INSTANCE, portalEntry.getValue())
+                            .ifSuccess(element -> {
+                                try (FileWriter writer = new FileWriter(PATH + "/" + portalEntry.getKey().getPath() + ".json")) {
+                                    gson.toJson(element, writer);
+                                    updatedFile.addAndGet(1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }).ifError(jsonElementError -> LOGGER.error("Failed to update file {} due to {}",portalEntry.getKey(),jsonElementError.error()));
+//
 
-                try (FileWriter writer = new FileWriter(PATH + "/" + portalEntry.getKey().getPath() + ".json")) {
-                    gson.toJson(jsonElement.get().left().get(), writer);
-                    updatedFile += 1;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 }
             }
         } catch (Exception ex) {
@@ -178,9 +194,102 @@ public class OutbreakPortalCommand {
         if(nullableSummoner instanceof Player player){
             player.sendSystemMessage(Component.literal("A new directory has been created at: " + PATH).withStyle(ChatFormatting.GREEN));
             player.sendSystemMessage(Component.literal("Updated " + updatedFile + " files").withStyle(ChatFormatting.GREEN));
-
+//
         }
-
         return 0;
+    }
+
+    public static int preventOutbreakSpawns(CommandContext<CommandSourceStack> c) {
+        try {
+            ServerLevel level = c.getSource().getLevel();
+            Entity entity = c.getSource().getEntity();
+
+            // Ensure the command is run by a player
+            if (!(entity instanceof Player player)) {
+                c.getSource().sendFailure(Component.literal("This command must be run by a player."));
+                return 0;
+            }
+
+            // Get player's current position
+            BlockPos bottomLeft = player.blockPosition();
+            int width = IntegerArgumentType.getInteger(c, "width");
+            int height = IntegerArgumentType.getInteger(c, "height");
+
+            OutbreakWorldManager worldManager = OutbreakWorldManager.get(level);
+            int addedChunks = addChunksToPreventionList(worldManager, bottomLeft, width, height);
+
+            // Inform the player
+            c.getSource().sendSuccess(() ->Component.literal("Added " + addedChunks + " chunks to the outbreak prevention list."), true);
+        } catch (Exception ex) {
+            c.getSource().sendFailure(Component.literal("Exception thrown - see log"));
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    public static int removeOutbreakSpawns(CommandContext<CommandSourceStack> c) {
+        try {
+            ServerLevel level = c.getSource().getLevel();
+            Entity entity = c.getSource().getEntity();
+
+            // Ensure command is run by a player
+            if (!(entity instanceof Player player)) {
+                c.getSource().sendFailure(Component.literal("This command must be run by a player."));
+                return 0;
+            }
+
+            // Get player's current position
+            BlockPos bottomLeft = player.blockPosition();
+            int width = IntegerArgumentType.getInteger(c, "width");
+            int height = IntegerArgumentType.getInteger(c, "height");
+
+            // Get outbreak manager and remove chunks
+            OutbreakWorldManager worldManager = OutbreakWorldManager.get(level);
+            int removedChunks = removeChunksFromPreventionList(worldManager, bottomLeft, width, height);
+
+            // Inform the player
+            c.getSource().sendSuccess(() -> Component.literal("Removed " + removedChunks + " chunks from the outbreak prevention list."), true);
+        } catch (Exception ex) {
+            c.getSource().sendFailure(Component.literal("Exception thrown - see log"));
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    /**
+     * Adds all chunks in a given XxX area to the OutbreakWorldManager prevention list.
+     */
+    private static int addChunksToPreventionList(OutbreakWorldManager worldManager, BlockPos bottomLeft, int width, int height) {
+        int addedChunks = 0;
+
+        // Iterate through the area and add all chunks
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < height; z++) {
+                ChunkPos chunkPos = new ChunkPos((bottomLeft.getX() >> 4) + x, (bottomLeft.getZ() >> 4) + z);
+                if (!worldManager.containsChunk(chunkPos)) {
+
+                    worldManager.addChunkToList(chunkPos);
+                    addedChunks++;
+                }
+            }
+        }
+        return addedChunks;
+    }
+
+    private static int removeChunksFromPreventionList(OutbreakWorldManager worldManager, BlockPos bottomLeft, int width, int height) {
+        int removedChunks = 0;
+
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < height; z++) {
+                ChunkPos chunkPos = new ChunkPos((bottomLeft.getX() >> 4) + x, (bottomLeft.getZ() >> 4) + z);
+                if (worldManager.containsChunk(chunkPos)) {
+                    worldManager.removeChunkFromList(chunkPos);
+                    removedChunks++;
+                }
+            }
+        }
+        return removedChunks;
     }
 }

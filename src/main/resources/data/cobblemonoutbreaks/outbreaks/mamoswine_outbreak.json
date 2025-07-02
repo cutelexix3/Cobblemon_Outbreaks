@@ -1,21 +1,51 @@
 {
-  "algorithms": {
-    "spawn_range": 30.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "#cobblemon:is_tundra"
+      ]
+    }
   },
-  "biome": [
-    "#cobblemon:is_tundra"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 2,
-    "pokemon_rarity": "epic",
-    "species": "mamoswine",
-    "waves": 3
+    "pokemon": "mamoswine",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 2
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "epic"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:sport_ball",
-      "cobblemon:rare_candy"
+      {
+        "item_reward": {
+          "id": "cobblemon:sport_ball",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:rare_candy",
+          "count": 1
+        },
+        "chance": 1.0
+      }
     ],
     "experience_reward": 300
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

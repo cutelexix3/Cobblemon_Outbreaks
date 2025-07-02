@@ -1,32 +1,57 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:nether_wastes",
+        "minecraft:soul_sand_valley",
+        "minecraft:crimson_forest",
+        "minecraft:warped_forest",
+        "minecraft:basalt_deltas",
+        "minecraft:plains",
+        "minecraft:forest",
+        "minecraft:flower_forest",
+        "minecraft:birch_forest",
+        "minecraft:old_growth_birch_forest",
+        "minecraft:dark_forest",
+        "minecraft:grove",
+        "minecraft:swamp",
+        "#cobblemon:is_abyss"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:nether_wastes",
-    "minecraft:soul_sand_valley",
-    "minecraft:crimson_forest",
-    "minecraft:warped_forest",
-    "minecraft:basalt_deltas",
-    "minecraft:plains",
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:grove",
-    "minecraft:swamp",
-    "#cobblemon:is_abyss"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 5,
-    "pokemon_rarity": "uncommon",
-    "species": "haunter",
-    "waves": 3
+    "pokemon": "haunter",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 5
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "uncommon"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:link_cable"
-    ]
+      {
+        "item_reward": {
+          "id": "cobblemon:link_cable",
+          "count": 1
+        },
+        "chance": 1.0
+      }
+    ],
+    "experience_reward": 0
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }

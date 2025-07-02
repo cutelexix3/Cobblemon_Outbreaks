@@ -1,24 +1,54 @@
 {
-  "algorithms": {
-    "spawn_range": 25.0
+  "spawn_settings": {
+    "outbreak_min_y": -63,
+    "outbreak_max_y": 255,
+    "biome_settings": {
+      "biome": [
+        "minecraft:lush_caves",
+        "minecraft:mangrove_swamp",
+        "minecraft:swamp",
+        "minecraft:mushroom_fields"
+      ]
+    }
   },
-  "biome": [
-    "minecraft:lush_caves",
-    "minecraft:mangrove_swamp",
-    "minecraft:swamp",
-    "minecraft:mushroom_fields"
-  ],
+  "gate_timer": 36000,
   "species_data": {
-    "spawns_per_wave": 5,
-    "pokemon_rarity": "uncommon",
-    "species": "parasect",
-    "waves": 3
+    "pokemon": "parasect",
+    "wave_data": {
+      "waves": 3,
+      "spawns_per_wave": 5
+    },
+    "species_shiny_data": {
+      "shiny_choice": "config",
+      "shiny_chance": 1024.0
+    },
+    "pokemon_rarity": "uncommon"
   },
   "rewards": {
     "item_rewards": [
-      "cobblemon:red_apricorn_seed",
-      "cobblemon:red_apricorn_seed"
+      {
+        "item_reward": {
+          "id": "cobblemon:red_apricorn_seed",
+          "count": 1
+        },
+        "chance": 1.0
+      },
+      {
+        "item_reward": {
+          "id": "cobblemon:red_apricorn_seed",
+          "count": 1
+        },
+        "chance": 1.0
+      }
     ],
     "experience_reward": 100
+  },
+  "algorithms": {
+    "level_algorithm": {
+      "type": "cobblemonoutbreaks:random"
+    },
+    "spawn_algorithm": {
+      "type": "cobblemonoutbreaks:open_field"
+    }
   }
 }
